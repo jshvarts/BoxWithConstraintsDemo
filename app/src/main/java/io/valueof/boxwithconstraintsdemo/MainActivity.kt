@@ -29,7 +29,11 @@ class MainActivity : ComponentActivity() {
     setContent {
       BoxWithConstraintsDemoTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          MyCardList()
+          val cardData = remember { generateCards() }
+
+          BoxWithConstraints {
+            AdaptiveLayoutCardList(cardData)
+          }
         }
       }
     }
@@ -37,36 +41,31 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyCardList() {
-  val cardData = remember { generateCards() }
-
-  BoxWithConstraints {
-    val boxWithConstraintsScope = this
-    LazyRow(
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      contentPadding = PaddingValues(24.dp)
-    ) {
-      items(cardData) { card ->
-        if (boxWithConstraintsScope.maxWidth > maxHeight) {
-          // in landscape mode
-          val cardWidth = boxWithConstraintsScope.maxWidth / 4
-          MyCard(
-            title = card.first,
-            subtitle = card.second,
-            height = boxWithConstraintsScope.maxHeight / 3,
-            width = cardWidth - cardWidth * 0.15f
-          )
-        } else {
-          // in portrait mode
-          val cardWidth = boxWithConstraintsScope.maxWidth / 2
-          MyCard(
-            title = card.first,
-            subtitle = card.second,
-            height = boxWithConstraintsScope.maxHeight / 4,
-            width = cardWidth - cardWidth * 0.2f
-          )
-        }
+fun BoxWithConstraintsScope.AdaptiveLayoutCardList(cardData: List<Pair<String, String>>) {
+  LazyRow(
+    horizontalArrangement = Arrangement.spacedBy(12.dp),
+    verticalAlignment = Alignment.CenterVertically,
+    contentPadding = PaddingValues(24.dp)
+  ) {
+    items(cardData) { card ->
+      if (maxWidth > maxHeight) {
+        // in landscape mode
+        val cardWidth = maxWidth / 4
+        MyCard(
+          title = card.first,
+          subtitle = card.second,
+          height = maxHeight / 3,
+          width = cardWidth - cardWidth * 0.15f
+        )
+      } else {
+        // in portrait mode
+        val cardWidth = maxWidth / 2
+        MyCard(
+          title = card.first,
+          subtitle = card.second,
+          height = maxHeight / 4,
+          width = cardWidth - cardWidth * 0.2f
+        )
       }
     }
   }
